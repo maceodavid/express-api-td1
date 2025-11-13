@@ -23,7 +23,7 @@ async function seed() {
 				username: "michel",
 				password: hashedPassword2,
 			},
-		]
+		];
 
         const insertedusers = await db.insert(usersTable).values(seedUsers).returning();
 
@@ -46,7 +46,7 @@ async function seed() {
 				difficulty: 'difficult',
 				author: insertedusers[1].id,
 			},
-		]
+		];
 
         await db.insert(questionstable).values(seedQuestions);
 
