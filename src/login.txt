@@ -1,0 +1,4 @@
+{
+  "email": "clement.catel@unicaen.fr",
+  "password": "password"
+}

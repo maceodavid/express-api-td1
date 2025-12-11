@@ -16,13 +16,17 @@ export const getAllQuestions = async (req, res) => {
 
 export const createQuestion = async (req, res) => {
     try {
-        const result = await db.insert(questionstable).values(req.body).returning();
+        const newQuestion = req.body;
+        newQuestion.author = req.user.userId;
+
+        const result = await db.insert(questionstable).values(newQuestion).returning();
 
         res.status(201).json({
             message: "Question created",
             question: result
         });
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             error: "Failed to create question"
         });
@@ -33,13 +37,21 @@ export const deleteQuestion = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const [result] = await db.delete(questionstable).where(eq(questionstable.id, id)).returning();
+        const [result] = await db.select().from(questionstable).where(eq(questionstable.id, id));
 
         if (!result) {
             return res.status(404).send({
                 error: "Question not found"
             });
         }
+
+        if (result.author !== req.user.userId) {
+            return res.status(403).send({
+                error: "Not your question"
+            });
+        }
+
+        await db.delete(questionstable).where(eq(questionstable.id, id)).returning();
 
         res.status(200).send({
             message: `Question ${id} deleted`

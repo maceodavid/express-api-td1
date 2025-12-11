@@ -1,5 +1,5 @@
 import { db } from "./database.js";
-import { questionstable, usersTable } from "./schema.js";
+import { categoriesTable, questionstable, usersTable } from "./schema.js";
 import bcrypt from "bcrypt";
 
 async function seed() {
@@ -17,6 +17,7 @@ async function seed() {
 				email: "clement.catel@unicaen.fr",
 				username: "clement",
 				password: hashedPassword1,
+				role: "ADMIN"
 			},
 			{
 				email: "michel@unicaen.fr",
@@ -27,24 +28,44 @@ async function seed() {
 
         const insertedusers = await db.insert(usersTable).values(seedUsers).returning();
 
+        const seedCategories = [
+			{
+				title: 'Histoire',
+				description: "Questions sur l'histoire"
+			},
+			{
+				title: 'Géographie',
+				description: "Questions sur la géographie"
+			},
+			{
+				title: 'Caca',
+				description: "Questions sur le caca"
+			}
+		];
+
+        const insertedCategories = await db.insert(categoriesTable).values(seedCategories).returning();
+
         const seedQuestions = [
 			{
 				questionText: 'Quelle est la capitale de la France?',
 				answer: 'Paris',
 				difficulty: 'easy',
 				author: insertedusers[0].id,
+				category: insertedCategories[1].id,
 			},
 			{
 				questionText: 'Quel est le plus grand océan du monde?',
 				answer: "L'océan Pacifique",
 				difficulty: 'medium',
 				author: insertedusers[1].id,
+				category: insertedCategories[1].id,
 			},
 			{
 				questionText: 'Qui a écrit "Les Misérables"?',
 				answer: 'Victor Hugo',
 				difficulty: 'difficult',
 				author: insertedusers[1].id,
+				category: insertedCategories[0].id,
 			},
 		];
 
